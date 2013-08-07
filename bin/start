@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+
+require 'appscript'
+require 'pry'
+include Appscript
+
+SETTING   = "Novel"
+TAB_COUNT = 3
+
+@term     = app('Terminal')
+
+def make_window
+  # window = term.make(:new => :window)
+  @term.activate app("System Events").application_processes[ "Terminal.app" ].keystroke("n", :using => :command_down)
+  windows.first.get
+end
+
+def make_tab
+  # window.make(:new => :tab)
+  @term.activate app("System Events").application_processes[ "Terminal.app" ].keystroke("t", :using => :command_down)
+  windows.first.tabs.first.get
+end
+
+def windows
+  @term.windows
+end
+
+# current_window = term.windows.first
+# tab = current_window.tabs.first
+# current_color = tab.background_color.get
+preferred_settings = nil
+
+# Create a new window
+@window = make_window
+puts(">>> #{@window}")
+
+# Find the preferred setting
+settings_array = @term.settings_sets.get
+settings_array.each do |set|
+  if set.name.get == 'Novel'
+    @window.current_settings.set(set)
+    break
+  end
+end
+
+# make some tabs
+adjusted_tabs = (TAB_COUNT-1)
+tab_range = Range.new(0,adjusted_tabs)
+for t in tab_range
+  make_tab
+end
